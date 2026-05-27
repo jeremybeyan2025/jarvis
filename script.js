@@ -5,9 +5,12 @@ const voiceStatus = document.getElementById("voiceStatus");
 const voiceTranscript = document.getElementById("voiceTranscript");
 const commandForm = document.getElementById("commandForm");
 const commandInput = document.getElementById("commandInput");
-const commandFeed = document.getElementById("commandFeed");
-const systemState = document.getElementById("systemState");
-const railClock = document.getElementById("railClock");
+const agentReply = document.getElementById("agentReply");
+const nextAction = document.getElementById("nextAction");
+const statusText = document.getElementById("statusText");
+const clock = document.getElementById("clock");
+const dateLine = document.getElementById("dateLine");
+const todayLabel = document.getElementById("todayLabel");
 
 let width = 0;
 let height = 0;
@@ -16,36 +19,42 @@ let mouse = { x: 0, y: 0 };
 let recognition = null;
 let listening = false;
 
-const commandResponses = {
-  "run threat scan": {
-    state: "SCANNING",
-    feed: "Threat scan complete. No hostile activity detected in the interface layer.",
-    transcript: "Threat scan complete. The field is clean.",
-    alert: true
+const responses = {
+  day: {
+    status: "Daily Brief Ready",
+    next: "Pick your top 3 outcomes",
+    reply: "Review your schedule, choose three priorities, log food early, and protect one focused work block.",
+    voice: "Your daily brief is ready. Choose three priorities and protect one focused work block."
   },
-  "open mission brief": {
-    state: "BRIEFING",
-    feed: "Mission brief loaded. Primary objective: build a more immersive, original AI control experience.",
-    transcript: "Mission brief loaded. Objective confirmed.",
-    alert: false
+  tasks: {
+    status: "Tasks Loaded",
+    next: "Clear the top task first",
+    reply: "Start with the task that creates the most leverage. Handle follow-ups after the first focus block.",
+    voice: "Tasks loaded. Start with the highest leverage task first."
   },
-  "power core": {
-    state: "CORE 100%",
-    feed: "Core output increased. Holographic interface is running at maximum visual intensity.",
-    transcript: "Core powered. Visual intensity increased.",
-    alert: false
+  health: {
+    status: "Health Snapshot",
+    next: "Hit protein before snacks",
+    reply: "Health module is on track. Prioritize protein, water, and movement before late snacks.",
+    voice: "Health is on track. Prioritize protein, water, and movement."
   },
-  "activate field mode": {
-    state: "FIELD MODE",
-    feed: "Field mode activated. Console is now optimized for fast mobile command interaction.",
-    transcript: "Field mode activated.",
-    alert: false
+  focus: {
+    status: "Focus Mode Active",
+    next: "Work for 45 minutes",
+    reply: "Focus mode started. Work one objective for 45 minutes, then check back in.",
+    voice: "Focus mode started. Work one objective for forty five minutes."
   },
-  "system status": {
-    state: "ONLINE",
-    feed: "System online. Voice command layer, particle field, and mission deck are operational.",
-    transcript: "All systems are online.",
-    alert: false
+  food: {
+    status: "Food Log Ready",
+    next: "Enter meal details",
+    reply: "Food logging is ready. Add the item, serving size, and quantity.",
+    voice: "Food logging is ready. Add item, serving size, and quantity."
+  },
+  projects: {
+    status: "Projects Ready",
+    next: "Choose one project lane",
+    reply: "Project view ready. Current lanes: websites, ads, fitness, and admin. Pick one and move it forward.",
+    voice: "Projects are ready. Choose one lane and move it forward."
   }
 };
 
@@ -58,26 +67,24 @@ function resizeCanvas() {
 }
 
 function createParticles() {
-  const count = Math.min(180, Math.floor(window.innerWidth / 7));
+  const count = Math.min(120, Math.floor(window.innerWidth / 10));
   particles = Array.from({ length: count }, (_, index) => ({
     x: Math.random() * width,
     y: Math.random() * height,
-    z: Math.random() * 1 + 0.25,
-    vx: (Math.random() - 0.5) * 0.42 * window.devicePixelRatio,
-    vy: (Math.random() - 0.5) * 0.42 * window.devicePixelRatio,
-    radius: (Math.random() * 1.8 + 0.5) * window.devicePixelRatio,
-    alpha: Math.random() * 0.65 + 0.18,
-    offset: index * 0.12
+    z: Math.random() * 0.7 + 0.35,
+    vx: (Math.random() - 0.5) * 0.28 * window.devicePixelRatio,
+    vy: (Math.random() - 0.5) * 0.28 * window.devicePixelRatio,
+    radius: (Math.random() * 1.4 + 0.35) * window.devicePixelRatio,
+    alpha: Math.random() * 0.38 + 0.12,
+    offset: index * 0.18
   }));
 }
 
 function drawParticles(time = 0) {
   ctx.clearRect(0, 0, width, height);
 
-  for (let i = 0; i < particles.length; i++) {
-    const p = particles[i];
-    const wave = Math.sin(time * 0.001 + p.offset) * 0.16;
-    p.x += p.vx * p.z + wave;
+  particles.forEach((p, i) => {
+    p.x += p.vx * p.z + Math.sin(time * 0.0007 + p.offset) * 0.09;
     p.y += p.vy * p.z;
 
     if (p.x < 0 || p.x > width) p.vx *= -1;
@@ -85,110 +92,99 @@ function drawParticles(time = 0) {
 
     const mx = mouse.x * window.devicePixelRatio;
     const my = mouse.y * window.devicePixelRatio;
-    const dx = p.x - mx;
-    const dy = p.y - my;
-    const distanceToMouse = Math.sqrt(dx * dx + dy * dy);
+    const distanceToMouse = Math.hypot(p.x - mx, p.y - my);
 
-    if (distanceToMouse < 180 * window.devicePixelRatio) {
-      p.x += dx * 0.0025;
-      p.y += dy * 0.0025;
+    if (distanceToMouse < 150 * window.devicePixelRatio) {
+      p.x += (p.x - mx) * 0.0018;
+      p.y += (p.y - my) * 0.0018;
     }
 
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.radius * p.z, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(88, 239, 255, ${p.alpha})`;
+    ctx.fillStyle = `rgba(121, 231, 255, ${p.alpha})`;
     ctx.fill();
 
     for (let j = i + 1; j < particles.length; j++) {
       const q = particles[j];
       const dist = Math.hypot(p.x - q.x, p.y - q.y);
-      const maxDist = 126 * window.devicePixelRatio;
-
+      const maxDist = 108 * window.devicePixelRatio;
       if (dist < maxDist) {
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
         ctx.lineTo(q.x, q.y);
-        ctx.strokeStyle = `rgba(88, 239, 255, ${(1 - dist / maxDist) * 0.18})`;
+        ctx.strokeStyle = `rgba(121, 231, 255, ${(1 - dist / maxDist) * 0.1})`;
         ctx.lineWidth = 1 * window.devicePixelRatio;
         ctx.stroke();
       }
     }
-  }
+  });
 
   requestAnimationFrame(drawParticles);
 }
 
-function updateClock() {
+function updateTime() {
   const now = new Date();
-  railClock.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  clock.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  dateLine.textContent = now.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" });
+  todayLabel.textContent = now.toLocaleDateString([], { weekday: "long" }).toUpperCase();
 }
 
-function speak(text) {
+function say(text) {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.92;
-  utterance.pitch = 0.82;
-  utterance.volume = 0.9;
-  window.speechSynthesis.speak(utterance);
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.rate = 0.96;
+  msg.pitch = 0.88;
+  msg.volume = 0.9;
+  window.speechSynthesis.speak(msg);
 }
 
-function normalizeCommand(value) {
-  return value.trim().toLowerCase().replace(/[.,!?]/g, "");
-}
-
-function findCommand(value) {
-  const normalized = normalizeCommand(value);
-  if (commandResponses[normalized]) return normalized;
-
-  if (normalized.includes("threat") || normalized.includes("scan")) return "run threat scan";
-  if (normalized.includes("mission") || normalized.includes("brief")) return "open mission brief";
-  if (normalized.includes("power") || normalized.includes("core")) return "power core";
-  if (normalized.includes("field")) return "activate field mode";
-  if (normalized.includes("status") || normalized.includes("online")) return "system status";
-
+function getIntent(value) {
+  const text = value.toLowerCase();
+  if (text.includes("day") || text.includes("brief") || text.includes("schedule")) return "day";
+  if (text.includes("task") || text.includes("todo") || text.includes("to do")) return "tasks";
+  if (text.includes("health") || text.includes("fitness") || text.includes("protein") || text.includes("calorie")) return "health";
+  if (text.includes("focus") || text.includes("work block")) return "focus";
+  if (text.includes("food") || text.includes("meal")) return "food";
+  if (text.includes("project") || text.includes("website") || text.includes("ads")) return "projects";
   return null;
 }
 
-function executeCommand(rawCommand) {
-  const matchedCommand = findCommand(rawCommand);
+function runCommand(value) {
+  const intent = getIntent(value);
 
-  if (!matchedCommand) {
-    systemState.textContent = "ROUTING";
-    commandFeed.textContent = `Command received: “${rawCommand}”. Custom routing is ready for backend integration.`;
-    voiceStatus.textContent = "Command routed";
-    voiceTranscript.textContent = rawCommand;
-    speak("Command received. Routing through the interface layer.");
-    document.body.classList.remove("alert-mode");
+  if (!intent) {
+    statusText.textContent = "Request Received";
+    nextAction.textContent = "Clarify request";
+    agentReply.textContent = `I heard: “${value}”. Try asking for your day, tasks, health, food, focus mode, or projects.`;
+    voiceStatus.textContent = "Request received";
+    voiceTranscript.textContent = value;
+    say("Request received. Try asking for your day, tasks, health, food, focus mode, or projects.");
     return;
   }
 
-  const response = commandResponses[matchedCommand];
-  systemState.textContent = response.state;
-  commandFeed.textContent = response.feed;
-  voiceStatus.textContent = "Command accepted";
-  voiceTranscript.textContent = response.transcript;
-  document.body.classList.toggle("alert-mode", response.alert);
-  speak(response.transcript);
+  const response = responses[intent];
+  statusText.textContent = response.status;
+  nextAction.textContent = response.next;
+  agentReply.textContent = response.reply;
+  voiceStatus.textContent = "Request handled";
+  voiceTranscript.textContent = response.voice;
+  say(response.voice);
 
   window.setTimeout(() => {
-    if (!document.body.classList.contains("listening")) {
-      systemState.textContent = "ARMED";
-      document.body.classList.remove("alert-mode");
-    }
-  }, 4200);
+    if (!document.body.classList.contains("listening")) statusText.textContent = "Assistant Online";
+  }, 4500);
 }
 
-function initSpeechRecognition() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-    voiceStatus.textContent = "Voice not supported";
-    voiceTranscript.textContent = "Your browser does not support live voice recognition. Type a command below instead.";
+function setupVoice() {
+  const Voice = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Voice) {
+    voiceStatus.textContent = "Type your request";
+    voiceTranscript.textContent = "Voice is not supported in this browser. Use the text bar instead.";
     return;
   }
 
-  recognition = new SpeechRecognition();
+  recognition = new Voice();
   recognition.continuous = false;
   recognition.interimResults = true;
   recognition.lang = "en-US";
@@ -197,64 +193,55 @@ function initSpeechRecognition() {
     listening = true;
     document.body.classList.add("listening");
     voiceStatus.textContent = "Listening...";
-    systemState.textContent = "LISTENING";
+    statusText.textContent = "Listening";
   };
 
   recognition.onresult = (event) => {
     let interim = "";
-    let final = "";
-
+    let finalText = "";
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript;
-      if (event.results[i].isFinal) final += transcript;
-      else interim += transcript;
+      const phrase = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalText += phrase;
+      else interim += phrase;
     }
-
-    voiceTranscript.textContent = final || interim || "Listening for command...";
-
-    if (final) executeCommand(final);
+    voiceTranscript.textContent = finalText || interim || "Listening...";
+    if (finalText) runCommand(finalText);
   };
 
   recognition.onerror = () => {
     voiceStatus.textContent = "Mic unavailable";
-    voiceTranscript.textContent = "Microphone access failed. Type the command instead.";
+    voiceTranscript.textContent = "Microphone access failed. Type your request instead.";
     document.body.classList.remove("listening");
-    systemState.textContent = "ARMED";
+    statusText.textContent = "Assistant Online";
     listening = false;
   };
 
   recognition.onend = () => {
     document.body.classList.remove("listening");
     listening = false;
-    if (systemState.textContent === "LISTENING") systemState.textContent = "ARMED";
+    if (statusText.textContent === "Listening") statusText.textContent = "Assistant Online";
   };
 }
 
 micButton.addEventListener("click", () => {
   if (!recognition) {
-    voiceStatus.textContent = "Type command";
-    voiceTranscript.textContent = "Voice recognition is not available here. Use the command input below.";
+    voiceStatus.textContent = "Type your request";
+    voiceTranscript.textContent = "Voice is unavailable here. Use the text bar.";
     return;
   }
-
-  if (listening) {
-    recognition.stop();
-    return;
-  }
-
-  recognition.start();
+  listening ? recognition.stop() : recognition.start();
 });
 
 commandForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const value = commandInput.value.trim();
   if (!value) return;
-  executeCommand(value);
+  runCommand(value);
   commandInput.value = "";
 });
 
 document.querySelectorAll("[data-command]").forEach((button) => {
-  button.addEventListener("click", () => executeCommand(button.dataset.command));
+  button.addEventListener("click", () => runCommand(button.dataset.command));
 });
 
 window.addEventListener("resize", resizeCanvas);
@@ -265,8 +252,8 @@ window.addEventListener("pointermove", (event) => {
 
 resizeCanvas();
 drawParticles();
-updateClock();
-setInterval(updateClock, 1000);
-initSpeechRecognition();
+updateTime();
+setInterval(updateTime, 1000);
+setupVoice();
 
-window.setTimeout(() => speak("Command interface online."), 900);
+window.setTimeout(() => say("Daily assistant online."), 900);
