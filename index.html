@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A cinematic AI command-center interface with futuristic HUD visuals, glass panels, animated scanlines, and interactive command modules."
+    />
+    <title>JARVIS Command Interface</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <div class="noise-layer" aria-hidden="true"></div>
+    <div class="grid-layer" aria-hidden="true"></div>
+    <div class="scanline-layer" aria-hidden="true"></div>
+
+    <main class="shell">
+      <header class="top-bar glass-panel">
+        <div class="brand-lockup">
+          <span class="brand-mark">J</span>
+          <div>
+            <p class="eyebrow">AI SYSTEM INTERFACE</p>
+            <h1>JARVIS COMMAND</h1>
+          </div>
+        </div>
+
+        <nav class="nav-pills" aria-label="Primary navigation">
+          <a href="#core">Core</a>
+          <a href="#modules">Modules</a>
+          <a href="#terminal">Terminal</a>
+        </nav>
+
+        <div class="system-status">
+          <span class="pulse-dot"></span>
+          <span>System Online</span>
+        </div>
+      </header>
+
+      <section id="core" class="hero-grid">
+        <div class="hero-copy glass-panel reveal-card">
+          <p class="eyebrow">BOOT SEQUENCE COMPLETE</p>
+          <h2>Your personal command center, built like a cinematic AI cockpit.</h2>
+          <p class="hero-text">
+            Track operations, run workflows, monitor performance, and control your digital stack from one immersive HUD-style interface.
+          </p>
+
+          <div class="cta-row">
+            <a class="primary-button" href="#terminal">Launch Interface</a>
+            <a class="ghost-button" href="#modules">View Modules</a>
+          </div>
+
+          <div class="hero-meta">
+            <div>
+              <strong>99.8%</strong>
+              <span>Signal Integrity</span>
+            </div>
+            <div>
+              <strong>04</strong>
+              <span>Active Modules</span>
+            </div>
+            <div>
+              <strong>LIVE</strong>
+              <span>Command Feed</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="core-stage reveal-card" aria-label="Animated AI core visualization">
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <div class="orbit orbit-three"></div>
+          <div class="core-glow"></div>
+          <div class="core-ring ring-a"></div>
+          <div class="core-ring ring-b"></div>
+          <div class="core-ring ring-c"></div>
+          <div class="ai-core">
+            <span class="core-label">CORE</span>
+            <span class="core-title">ONLINE</span>
+          </div>
+          <div class="radar-sweep"></div>
+          <div class="hud-marker marker-one">SYNC</div>
+          <div class="hud-marker marker-two">SCAN</div>
+          <div class="hud-marker marker-three">READY</div>
+        </div>
+
+        <aside class="side-stack">
+          <article class="mini-card glass-panel reveal-card">
+            <span class="mini-label">NEURAL LOAD</span>
+            <strong>72%</strong>
+            <div class="meter"><span style="--fill: 72%"></span></div>
+          </article>
+          <article class="mini-card glass-panel reveal-card delay-1">
+            <span class="mini-label">SECURITY</span>
+            <strong>Encrypted</strong>
+            <div class="meter"><span style="--fill: 91%"></span></div>
+          </article>
+          <article class="mini-card glass-panel reveal-card delay-2">
+            <span class="mini-label">WORKFLOW QUEUE</span>
+            <strong>18 Tasks</strong>
+            <div class="meter"><span style="--fill: 54%"></span></div>
+          </article>
+        </aside>
+      </section>
+
+      <section id="modules" class="section-block">
+        <div class="section-heading reveal-card">
+          <p class="eyebrow">MISSION MODULES</p>
+          <h2>Four command panels. One operating layer.</h2>
+        </div>
+
+        <div class="module-grid">
+          <article class="module-card glass-panel reveal-card">
+            <div class="module-icon">01</div>
+            <h3>Performance Core</h3>
+            <p>Monitor fitness, nutrition, output, and daily execution with high-contrast data cards.</p>
+            <span>Calories · Training · Targets</span>
+          </article>
+
+          <article class="module-card glass-panel reveal-card delay-1">
+            <div class="module-icon">02</div>
+            <h3>Business Ops</h3>
+            <p>Track campaigns, leads, creative assets, launches, funnels, and revenue opportunities.</p>
+            <span>Ads · Pipeline · Sites</span>
+          </article>
+
+          <article class="module-card glass-panel reveal-card delay-2">
+            <div class="module-icon">03</div>
+            <h3>Legal War Room</h3>
+            <p>Organize litigation facts, motions, discovery targets, exhibits, and hearing strategy.</p>
+            <span>Cases · Evidence · Timeline</span>
+          </article>
+
+          <article class="module-card glass-panel reveal-card delay-3">
+            <div class="module-icon">04</div>
+            <h3>AI Command</h3>
+            <p>Use a central terminal-style command bar to simulate task routing and system responses.</p>
+            <span>Prompt · Analyze · Execute</span>
+          </article>
+        </div>
+      </section>
+
+      <section id="terminal" class="command-section glass-panel reveal-card">
+        <div class="terminal-header">
+          <div>
+            <p class="eyebrow">COMMAND TERMINAL</p>
+            <h2>Ask the interface to route a mission.</h2>
+          </div>
+          <div class="clock" id="clock">00:00:00</div>
+        </div>
+
+        <div class="terminal-window" id="terminalWindow" aria-live="polite">
+          <p><span>system</span> Initializing interface...</p>
+          <p><span>system</span> HUD layers stabilized.</p>
+          <p><span>system</span> Awaiting command input.</p>
+        </div>
+
+        <form class="command-form" id="commandForm">
+          <label class="sr-only" for="commandInput">Enter command</label>
+          <input
+            id="commandInput"
+            type="text"
+            autocomplete="off"
+            placeholder="Try: scan modules, run diagnostics, show mission status"
+          />
+          <button type="submit">Execute</button>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer-note">
+      <span>Designed as an original futuristic AI HUD interface.</span>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
