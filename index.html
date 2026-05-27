@@ -3,146 +3,142 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="An original cinematic AI command interface with 3D HUD visuals, voice command controls, mission panels, and immersive motion."
-    />
-    <title>JARVIS // Field Console</title>
+    <meta name="description" content="A premium daily AI assistant dashboard with voice control, schedule, tasks, health tracking, and project modules." />
+    <title>JARVIS Daily Assistant</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <canvas id="starfield" aria-hidden="true"></canvas>
-    <div class="matrix-grid" aria-hidden="true"></div>
-    <div class="depth-vignette" aria-hidden="true"></div>
-    <div class="scan-wash" aria-hidden="true"></div>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+    <div class="surface-grid" aria-hidden="true"></div>
 
-    <main class="command-deck">
-      <aside class="left-rail glass-slab">
-        <div class="rail-logo">
-          <span>J</span>
-          <small>OS</small>
-        </div>
-
-        <div class="rail-track" aria-hidden="true">
-          <span class="track-node active"></span>
-          <span class="track-node"></span>
-          <span class="track-node warning"></span>
-          <span class="track-node"></span>
-        </div>
-
-        <div class="rail-meta">
-          <span>LIVE</span>
-          <strong id="railClock">00:00</strong>
-        </div>
-      </aside>
-
-      <section class="main-console">
-        <header class="console-top glass-slab">
+    <main class="agent-shell">
+      <header class="agent-top glass">
+        <div class="brand-block">
+          <div class="brand-orb">J</div>
           <div>
-            <p class="kicker">FIELD CONSOLE // ACTIVE SESSION</p>
-            <h1>J.A.R.V.I.S</h1>
+            <p class="overline">PERSONAL DAILY ASSISTANT</p>
+            <h1>JARVIS Daily OS</h1>
           </div>
+        </div>
 
-          <nav class="console-nav" aria-label="Interface sections">
-            <a href="#holoCore">Core</a>
-            <a href="#voicePanel">Voice</a>
-            <a href="#missionDock">Mission</a>
-          </nav>
+        <nav class="top-nav" aria-label="Daily assistant sections">
+          <a href="#brief">Brief</a>
+          <a href="#voice">Voice</a>
+          <a href="#dashboard">Dashboard</a>
+        </nav>
 
-          <div class="system-chip">
-            <span class="status-light"></span>
-            <span id="systemState">ARMED</span>
+        <div class="live-status">
+          <span class="status-dot"></span>
+          <span id="statusText">Assistant Online</span>
+        </div>
+      </header>
+
+      <section id="brief" class="daily-hero">
+        <article class="morning-card glass">
+          <p class="overline" id="todayLabel">TODAY</p>
+          <h2>Your day, organized before it starts.</h2>
+          <p class="hero-copy">
+            Ask for your schedule, tasks, food log, workout status, project priorities,
+            reminders, or focus mode. One calm voice layer for your entire day.
+          </p>
+
+          <div class="daily-stats" aria-label="Daily summary stats">
+            <div><span>Focus</span><strong>3 blocks</strong></div>
+            <div><span>Tasks</span><strong>8 open</strong></div>
+            <div><span>Health</span><strong>on track</strong></div>
           </div>
-        </header>
+        </article>
 
-        <section class="hero-arena">
-          <div class="command-copy glass-slab">
-            <p class="kicker">ZERO-LATENCY COMMAND LAYER</p>
-            <h2>Not a website. A control room.</h2>
-            <p>
-              A cinematic AI operating surface with voice commands, live mission feedback,
-              3D holographic motion, and a command deck built to feel like a real interface.
-            </p>
-
-            <div class="quick-actions" aria-label="Quick command actions">
-              <button data-command="run threat scan">Threat Scan</button>
-              <button data-command="open mission brief">Mission Brief</button>
-              <button data-command="power core">Power Core</button>
-            </div>
-          </div>
-
-          <div id="holoCore" class="holo-stage" aria-label="3D holographic AI core">
-            <div class="targeting-frame frame-a"></div>
-            <div class="targeting-frame frame-b"></div>
-            <div class="holo-orbit orbit-a"></div>
-            <div class="holo-orbit orbit-b"></div>
-            <div class="holo-orbit orbit-c"></div>
-            <div class="holo-ring ring-one"></div>
-            <div class="holo-ring ring-two"></div>
-            <div class="holo-ring ring-three"></div>
-            <div class="holo-globe">
-              <div class="globe-shine"></div>
-              <div class="globe-grid"></div>
-              <span>CORE</span>
-              <strong>ONLINE</strong>
-            </div>
-            <div class="holo-cube" aria-hidden="true">
-              <span></span><span></span><span></span><span></span><span></span><span></span>
-            </div>
-            <div class="scan-beam"></div>
-            <div class="holo-tag tag-one">SYNC 99.8</div>
-            <div class="holo-tag tag-two">VOICE READY</div>
-            <div class="holo-tag tag-three">FIELD MODE</div>
-          </div>
-
-          <aside id="voicePanel" class="voice-panel glass-slab">
-            <p class="kicker">VOICE COMMAND</p>
-            <button id="micButton" class="mic-button" type="button" aria-label="Start voice command">
-              <span class="mic-ripple"></span>
-              <span class="mic-icon">◉</span>
+        <section id="voice" class="agent-core glass" aria-label="Voice assistant control">
+          <div class="core-depth">
+            <div class="halo halo-one"></div>
+            <div class="halo halo-two"></div>
+            <div class="halo halo-three"></div>
+            <button id="micButton" class="voice-orb" type="button" aria-label="Start voice command">
+              <span class="orb-light"></span>
+              <span class="orb-text">ASK</span>
             </button>
-            <h3 id="voiceStatus">Tap mic to speak</h3>
-            <p id="voiceTranscript" class="voice-transcript">Say: “run threat scan”, “open mission brief”, or “power core”.</p>
+          </div>
 
-            <form id="commandForm" class="command-line">
-              <label class="sr-only" for="commandInput">Type command</label>
-              <input id="commandInput" type="text" autocomplete="off" placeholder="Type command..." />
-              <button type="submit">Send</button>
-            </form>
-          </aside>
+          <div class="voice-copy">
+            <p class="overline">VOICE READY</p>
+            <h3 id="voiceStatus">Tap to talk to Jarvis</h3>
+            <p id="voiceTranscript">Try: “What’s my day look like?” or “Show my health status.”</p>
+          </div>
+
+          <form id="commandForm" class="ask-bar">
+            <label class="sr-only" for="commandInput">Type a command</label>
+            <input id="commandInput" type="text" autocomplete="off" placeholder="Ask: what’s my day, show tasks, log food, start focus mode..." />
+            <button type="submit">Ask</button>
+          </form>
         </section>
 
-        <section id="missionDock" class="mission-dock">
-          <article class="mission-card glass-slab hot">
-            <span>01</span>
-            <h3>Signal Map</h3>
-            <p>Particle grid, live motion, visual targeting, and interface telemetry.</p>
-          </article>
+        <aside class="dayline glass">
+          <div class="time-block">
+            <span id="clock">00:00</span>
+            <small id="dateLine">Loading date</small>
+          </div>
+          <div class="next-card">
+            <p class="overline">NEXT BEST ACTION</p>
+            <h3 id="nextAction">Review priority tasks</h3>
+            <p id="agentReply">Your assistant is standing by for a daily command.</p>
+          </div>
+        </aside>
+      </section>
 
-          <article class="mission-card glass-slab">
-            <span>02</span>
-            <h3>Ops Stack</h3>
-            <p>Fitness, legal, business, content, websites, and campaign control modules.</p>
-          </article>
+      <section id="dashboard" class="dashboard-grid">
+        <article class="dash-card glass priority-card">
+          <div class="card-head"><span>01</span><p>Today’s Brief</p></div>
+          <h3>Start clean. Move with a plan.</h3>
+          <ul>
+            <li>Check calendar and deadlines</li>
+            <li>Pick top 3 outcomes</li>
+            <li>Review nutrition and workout status</li>
+          </ul>
+        </article>
 
-          <article class="mission-card glass-slab">
-            <span>03</span>
-            <h3>Command Feed</h3>
-            <p id="commandFeed">Awaiting instruction from operator.</p>
-          </article>
+        <article class="dash-card glass">
+          <div class="card-head"><span>02</span><p>Schedule</p></div>
+          <h3>Daily timeline</h3>
+          <div class="timeline">
+            <div><strong>AM</strong><span>Briefing + planning</span></div>
+            <div><strong>Midday</strong><span>Work block + follow-ups</span></div>
+            <div><strong>PM</strong><span>Training + review</span></div>
+          </div>
+        </article>
 
-          <article class="mission-card glass-slab danger">
-            <span>04</span>
-            <h3>Protocol</h3>
-            <p>Voice requests trigger visual state changes and spoken system response.</p>
-          </article>
-        </section>
+        <article class="dash-card glass">
+          <div class="card-head"><span>03</span><p>Health</p></div>
+          <h3>Fitness + food</h3>
+          <div class="meter-row"><span>Protein</span><div><i style="--fill:72%"></i></div></div>
+          <div class="meter-row"><span>Calories</span><div><i style="--fill:48%"></i></div></div>
+          <div class="meter-row"><span>Movement</span><div><i style="--fill:64%"></i></div></div>
+        </article>
+
+        <article class="dash-card glass">
+          <div class="card-head"><span>04</span><p>Projects</p></div>
+          <h3>Active workstreams</h3>
+          <div class="project-pills">
+            <span>Websites</span><span>Ads</span><span>Fitness</span><span>Admin</span>
+          </div>
+        </article>
+
+        <article class="dash-card glass wide-card">
+          <div class="card-head"><span>05</span><p>Quick Commands</p></div>
+          <div class="command-chips">
+            <button data-command="what is my day">What’s my day?</button>
+            <button data-command="show tasks">Show tasks</button>
+            <button data-command="show health">Health status</button>
+            <button data-command="start focus mode">Focus mode</button>
+            <button data-command="log food">Log food</button>
+            <button data-command="show projects">Projects</button>
+          </div>
+        </article>
       </section>
     </main>
 
