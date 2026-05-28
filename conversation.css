@@ -1,0 +1,100 @@
+.conversation-panel {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.conversation-log {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-height: 170px;
+  max-height: 240px;
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid rgba(166, 216, 255, 0.14);
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.22);
+  text-align: left;
+  scroll-behavior: smooth;
+}
+
+.chat-row {
+  display: grid;
+  gap: 6px;
+  max-width: 86%;
+  padding: 12px 14px;
+  border: 1px solid rgba(166, 216, 255, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.chat-row span {
+  color: var(--cyan);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.chat-row p {
+  margin: 0;
+  color: var(--soft);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.chat-row.user {
+  justify-self: end;
+  border-color: rgba(149, 255, 226, 0.24);
+  background: rgba(149, 255, 226, 0.075);
+}
+
+.chat-row.user span {
+  color: var(--mint);
+}
+
+.chat-row.jarvis {
+  justify-self: start;
+}
+
+.conversation-toggle {
+  min-height: 42px;
+  border: 1px solid rgba(166, 216, 255, 0.2);
+  border-radius: 999px;
+  color: var(--soft);
+  background: rgba(255, 255, 255, 0.035);
+  font: inherit;
+  cursor: pointer;
+  transition: 180ms ease;
+}
+
+.conversation-toggle:hover,
+.conversation-toggle.active {
+  border-color: var(--line-hot);
+  color: var(--text);
+  background: rgba(121, 231, 255, 0.08);
+  box-shadow: 0 0 26px rgba(121, 231, 255, 0.12);
+}
+
+body.listening .voice-copy h3::after {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 18px var(--mint);
+}
+
+@media (max-width: 760px) {
+  .conversation-log {
+    max-height: 260px;
+  }
+
+  .chat-row {
+    max-width: 94%;
+  }
+}
