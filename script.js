@@ -11,6 +11,8 @@ const statusText = document.getElementById("statusText");
 const clock = document.getElementById("clock");
 const dateLine = document.getElementById("dateLine");
 const todayLabel = document.getElementById("todayLabel");
+const conversationLog = document.getElementById("conversationLog");
+const conversationToggle = document.getElementById("conversationToggle");
 
 let width = 0;
 let height = 0;
@@ -18,43 +20,44 @@ let particles = [];
 let mouse = { x: 0, y: 0 };
 let recognition = null;
 let listening = false;
+let continuousMode = false;
+let assistantSpeaking = false;
 
-const responses = {
+const replies = {
   day: {
     status: "Daily Brief Ready",
     next: "Pick your top 3 outcomes",
-    reply: "Review your schedule, choose three priorities, log food early, and protect one focused work block.",
-    voice: "Your daily brief is ready. Choose three priorities and protect one focused work block."
+    text: "Your day is clean. Start with three priorities, log food early, and protect one focused work block."
   },
   tasks: {
     status: "Tasks Loaded",
     next: "Clear the top task first",
-    reply: "Start with the task that creates the most leverage. Handle follow-ups after the first focus block.",
-    voice: "Tasks loaded. Start with the highest leverage task first."
+    text: "Start with the task that creates the most leverage. Push follow-ups after your first focus block."
   },
   health: {
     status: "Health Snapshot",
-    next: "Hit protein before snacks",
-    reply: "Health module is on track. Prioritize protein, water, and movement before late snacks.",
-    voice: "Health is on track. Prioritize protein, water, and movement."
+    next: "Protein before snacks",
+    text: "Health is on track. Hit protein, water, and movement before you add snacks later."
   },
   focus: {
     status: "Focus Mode Active",
     next: "Work for 45 minutes",
-    reply: "Focus mode started. Work one objective for 45 minutes, then check back in.",
-    voice: "Focus mode started. Work one objective for forty five minutes."
+    text: "Focus mode is active. One objective, forty five minutes, no drifting."
   },
   food: {
     status: "Food Log Ready",
     next: "Enter meal details",
-    reply: "Food logging is ready. Add the item, serving size, and quantity.",
-    voice: "Food logging is ready. Add item, serving size, and quantity."
+    text: "Food logging is ready. Tell me the item, serving size, and quantity."
   },
   projects: {
     status: "Projects Ready",
-    next: "Choose one project lane",
-    reply: "Project view ready. Current lanes: websites, ads, fitness, and admin. Pick one and move it forward.",
-    voice: "Projects are ready. Choose one lane and move it forward."
+    next: "Choose one lane",
+    text: "Your project lanes are websites, ads, fitness, and admin. Pick one and I will keep you moving."
+  },
+  greeting: {
+    status: "Listening",
+    next: "Ask your next question",
+    text: "I am here. Ask me about your day, tasks, health, food, focus, or projects."
   }
 };
 
@@ -129,58 +132,71 @@ function updateTime() {
   todayLabel.textContent = now.toLocaleDateString([], { weekday: "long" }).toUpperCase();
 }
 
-function say(text) {
+function addMessage(role, text) {
+  const row = document.createElement("div");
+  row.className = `chat-row ${role === "user" ? "user" : "jarvis"}`;
+  row.innerHTML = `<span>${role === "user" ? "You" : "Jarvis"}</span><p></p>`;
+  row.querySelector("p").textContent = text;
+  conversationLog.appendChild(row);
+  conversationLog.scrollTop = conversationLog.scrollHeight;
+}
+
+function speak(text) {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
-  const msg = new SpeechSynthesisUtterance(text);
-  msg.rate = 0.96;
-  msg.pitch = 0.88;
-  msg.volume = 0.9;
-  window.speechSynthesis.speak(msg);
+  assistantSpeaking = true;
+  const message = new SpeechSynthesisUtterance(text);
+  message.rate = 0.96;
+  message.pitch = 0.86;
+  message.volume = 0.92;
+  message.onend = () => {
+    assistantSpeaking = false;
+    if (continuousMode && recognition && !listening) {
+      setTimeout(() => startListening(), 450);
+    }
+  };
+  window.speechSynthesis.speak(message);
 }
 
 function getIntent(value) {
   const text = value.toLowerCase();
+  if (text.includes("hello") || text.includes("jarvis") || text.includes("hey")) return "greeting";
   if (text.includes("day") || text.includes("brief") || text.includes("schedule")) return "day";
   if (text.includes("task") || text.includes("todo") || text.includes("to do")) return "tasks";
   if (text.includes("health") || text.includes("fitness") || text.includes("protein") || text.includes("calorie")) return "health";
   if (text.includes("focus") || text.includes("work block")) return "focus";
-  if (text.includes("food") || text.includes("meal")) return "food";
+  if (text.includes("food") || text.includes("meal") || text.includes("log")) return "food";
   if (text.includes("project") || text.includes("website") || text.includes("ads")) return "projects";
   return null;
 }
 
-function runCommand(value) {
-  const intent = getIntent(value);
+function respondTo(text) {
+  addMessage("user", text);
+  const intent = getIntent(text);
+  const reply = intent ? replies[intent] : {
+    status: "Request Received",
+    next: "Ask another question",
+    text: "I heard you. Right now I can talk about your day, tasks, health, food, focus, and projects."
+  };
 
-  if (!intent) {
-    statusText.textContent = "Request Received";
-    nextAction.textContent = "Clarify request";
-    agentReply.textContent = `I heard: “${value}”. Try asking for your day, tasks, health, food, focus mode, or projects.`;
-    voiceStatus.textContent = "Request received";
-    voiceTranscript.textContent = value;
-    say("Request received. Try asking for your day, tasks, health, food, focus mode, or projects.");
-    return;
-  }
+  statusText.textContent = reply.status;
+  nextAction.textContent = reply.next;
+  agentReply.textContent = reply.text;
+  voiceStatus.textContent = "Jarvis replied";
+  voiceTranscript.textContent = reply.text;
+  addMessage("jarvis", reply.text);
+  speak(reply.text);
 
-  const response = responses[intent];
-  statusText.textContent = response.status;
-  nextAction.textContent = response.next;
-  agentReply.textContent = response.reply;
-  voiceStatus.textContent = "Request handled";
-  voiceTranscript.textContent = response.voice;
-  say(response.voice);
-
-  window.setTimeout(() => {
+  setTimeout(() => {
     if (!document.body.classList.contains("listening")) statusText.textContent = "Assistant Online";
-  }, 4500);
+  }, 5000);
 }
 
 function setupVoice() {
   const Voice = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!Voice) {
-    voiceStatus.textContent = "Type your request";
-    voiceTranscript.textContent = "Voice is not supported in this browser. Use the text bar instead.";
+    voiceStatus.textContent = "Type to talk";
+    voiceTranscript.textContent = "Voice recognition is not supported in this browser. Use the text bar.";
     return;
   }
 
@@ -205,12 +221,12 @@ function setupVoice() {
       else interim += phrase;
     }
     voiceTranscript.textContent = finalText || interim || "Listening...";
-    if (finalText) runCommand(finalText);
+    if (finalText) respondTo(finalText);
   };
 
   recognition.onerror = () => {
     voiceStatus.textContent = "Mic unavailable";
-    voiceTranscript.textContent = "Microphone access failed. Type your request instead.";
+    voiceTranscript.textContent = "Microphone access failed. Type your message instead.";
     document.body.classList.remove("listening");
     statusText.textContent = "Assistant Online";
     listening = false;
@@ -219,29 +235,49 @@ function setupVoice() {
   recognition.onend = () => {
     document.body.classList.remove("listening");
     listening = false;
+    if (!assistantSpeaking && continuousMode) setTimeout(() => startListening(), 600);
     if (statusText.textContent === "Listening") statusText.textContent = "Assistant Online";
   };
 }
 
+function startListening() {
+  if (!recognition || listening || assistantSpeaking) return;
+  try {
+    recognition.start();
+  } catch (error) {
+    listening = false;
+  }
+}
+
 micButton.addEventListener("click", () => {
   if (!recognition) {
-    voiceStatus.textContent = "Type your request";
+    voiceStatus.textContent = "Type to talk";
     voiceTranscript.textContent = "Voice is unavailable here. Use the text bar.";
     return;
   }
-  listening ? recognition.stop() : recognition.start();
+  listening ? recognition.stop() : startListening();
+});
+
+conversationToggle.addEventListener("click", () => {
+  continuousMode = !continuousMode;
+  conversationToggle.classList.toggle("active", continuousMode);
+  conversationToggle.textContent = `Continuous Conversation: ${continuousMode ? "On" : "Off"}`;
+  if (continuousMode) {
+    addMessage("jarvis", "Continuous conversation is on. I will listen again after I answer.");
+    speak("Continuous conversation is on. I will listen again after I answer.");
+  }
 });
 
 commandForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const value = commandInput.value.trim();
   if (!value) return;
-  runCommand(value);
+  respondTo(value);
   commandInput.value = "";
 });
 
 document.querySelectorAll("[data-command]").forEach((button) => {
-  button.addEventListener("click", () => runCommand(button.dataset.command));
+  button.addEventListener("click", () => respondTo(button.dataset.command));
 });
 
 window.addEventListener("resize", resizeCanvas);
@@ -256,4 +292,4 @@ updateTime();
 setInterval(updateTime, 1000);
 setupVoice();
 
-window.setTimeout(() => say("Daily assistant online."), 900);
+setTimeout(() => speak("Daily assistant online."), 900);
