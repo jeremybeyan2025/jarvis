@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="A premium daily AI assistant dashboard with voice control, schedule, tasks, health tracking, and project modules." />
+    <meta name="description" content="A premium daily AI assistant dashboard with voice conversation, schedule, tasks, health tracking, and project modules." />
     <title>JARVIS Daily Assistant</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="conversation.css" />
   </head>
   <body>
     <canvas id="starfield" aria-hidden="true"></canvas>
@@ -43,8 +44,8 @@
           <p class="overline" id="todayLabel">TODAY</p>
           <h2>Your day, organized before it starts.</h2>
           <p class="hero-copy">
-            Ask for your schedule, tasks, food log, workout status, project priorities,
-            reminders, or focus mode. One calm voice layer for your entire day.
+            Talk to Jarvis about your schedule, tasks, food log, workout status, project priorities,
+            reminders, or focus mode. He answers out loud and keeps the conversation on screen.
           </p>
 
           <div class="daily-stats" aria-label="Daily summary stats">
@@ -66,15 +67,25 @@
           </div>
 
           <div class="voice-copy">
-            <p class="overline">VOICE READY</p>
+            <p class="overline">CONVERSATION READY</p>
             <h3 id="voiceStatus">Tap to talk to Jarvis</h3>
-            <p id="voiceTranscript">Try: “What’s my day look like?” or “Show my health status.”</p>
+            <p id="voiceTranscript">Try: “Jarvis, what’s my day look like?”</p>
+          </div>
+
+          <div class="conversation-panel" aria-label="Jarvis conversation">
+            <div id="conversationLog" class="conversation-log">
+              <div class="chat-row jarvis">
+                <span>Jarvis</span>
+                <p>Good morning. I’m online. Ask me about your day, tasks, health, food, focus, or projects.</p>
+              </div>
+            </div>
+            <button id="conversationToggle" class="conversation-toggle" type="button">Continuous Conversation: Off</button>
           </div>
 
           <form id="commandForm" class="ask-bar">
             <label class="sr-only" for="commandInput">Type a command</label>
-            <input id="commandInput" type="text" autocomplete="off" placeholder="Ask: what’s my day, show tasks, log food, start focus mode..." />
-            <button type="submit">Ask</button>
+            <input id="commandInput" type="text" autocomplete="off" placeholder="Talk or type: what’s my day, show tasks, log food..." />
+            <button type="submit">Send</button>
           </form>
         </section>
 
@@ -86,7 +97,7 @@
           <div class="next-card">
             <p class="overline">NEXT BEST ACTION</p>
             <h3 id="nextAction">Review priority tasks</h3>
-            <p id="agentReply">Your assistant is standing by for a daily command.</p>
+            <p id="agentReply">Jarvis is standing by for a daily conversation.</p>
           </div>
         </aside>
       </section>
@@ -129,7 +140,7 @@
         </article>
 
         <article class="dash-card glass wide-card">
-          <div class="card-head"><span>05</span><p>Quick Commands</p></div>
+          <div class="card-head"><span>05</span><p>Quick Conversation Starters</p></div>
           <div class="command-chips">
             <button data-command="what is my day">What’s my day?</button>
             <button data-command="show tasks">Show tasks</button>
